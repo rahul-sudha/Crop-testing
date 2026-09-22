@@ -477,6 +477,12 @@
     }
   });
 
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && selectedHandle) {
+      deselectHandle();
+    }
+  });
+
   // Directional buttons: visual click state + a small nudge animation only.
   var dpadButtons = document.querySelectorAll('.dpad-btn');
   dpadButtons.forEach(function (btn) {
