@@ -422,14 +422,18 @@
   var cropStage = document.getElementById('cropStage');
 
   var selectedHandle = null;
+  var firstMoveControl = moveToolbar.querySelector('.dpad-btn');
 
-  function selectHandle(handle) {
+  function selectHandle(handle, viaKeyboard) {
     if (selectedHandle) {
       selectedHandle.classList.remove('selected');
     }
     selectedHandle = handle;
     selectedHandle.classList.add('selected');
     showMoveToolbar();
+    if (viaKeyboard) {
+      firstMoveControl.focus();
+    }
   }
 
   function deselectHandle() {
@@ -460,7 +464,7 @@
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         e.stopPropagation();
-        selectHandle(handle);
+        selectHandle(handle, true);
       }
     });
   });
