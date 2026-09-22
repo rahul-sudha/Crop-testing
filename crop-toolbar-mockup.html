@@ -173,6 +173,15 @@
     transform: scale(1.15);
   }
 
+  .handle:focus {
+    outline: none;
+  }
+
+  .handle:focus-visible .handle-shape {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+  }
+
   /* corner positions */
   .handle[data-pos="tl"] { top: 4%; left: 4%; transform: translate(-50%, -50%); }
   .handle[data-pos="tr"] { top: 4%; left: 96%; transform: translate(-50%, -50%); }
@@ -345,16 +354,16 @@
         <div class="crop-boundary"></div>
 
         <!-- corner handles -->
-        <div class="handle corner" data-pos="tl"><div class="handle-shape"></div></div>
-        <div class="handle corner" data-pos="tr"><div class="handle-shape"></div></div>
-        <div class="handle corner" data-pos="bl"><div class="handle-shape"></div></div>
-        <div class="handle corner" data-pos="br"><div class="handle-shape"></div></div>
+        <div class="handle corner" data-pos="tl" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle corner" data-pos="tr" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle corner" data-pos="bl" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle corner" data-pos="br" tabindex="0"><div class="handle-shape"></div></div>
 
         <!-- edge midpoint handles -->
-        <div class="handle edge" data-pos="top"><div class="handle-shape"></div></div>
-        <div class="handle edge" data-pos="bottom"><div class="handle-shape"></div></div>
-        <div class="handle edge vertical" data-pos="left"><div class="handle-shape"></div></div>
-        <div class="handle edge vertical" data-pos="right"><div class="handle-shape"></div></div>
+        <div class="handle edge" data-pos="top" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle edge" data-pos="bottom" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle edge vertical" data-pos="left" tabindex="0"><div class="handle-shape"></div></div>
+        <div class="handle edge vertical" data-pos="right" tabindex="0"><div class="handle-shape"></div></div>
       </div>
     </div>
   </div>
@@ -445,6 +454,14 @@
     handle.addEventListener('click', function (e) {
       e.stopPropagation();
       selectHandle(handle);
+    });
+
+    handle.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        e.stopPropagation();
+        selectHandle(handle);
+      }
     });
   });
 
