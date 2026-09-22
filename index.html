@@ -436,12 +436,16 @@
     }
   }
 
-  function deselectHandle() {
+  function deselectHandle(viaKeyboard) {
+    var handleToRefocus = selectedHandle;
     if (selectedHandle) {
       selectedHandle.classList.remove('selected');
       selectedHandle = null;
     }
     showDefaultToolbar();
+    if (viaKeyboard && handleToRefocus) {
+      handleToRefocus.focus();
+    }
   }
 
   function showMoveToolbar() {
@@ -471,7 +475,8 @@
 
   moveDoneBtn.addEventListener('click', function (e) {
     e.stopPropagation();
-    deselectHandle();
+    // detail is 0 for a keyboard-triggered click (Enter/Space), >=1 for a real pointer click.
+    deselectHandle(e.detail === 0);
   });
 
   // Tapping elsewhere on the canvas (outside any handle) reverts selection.
@@ -483,7 +488,7 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && selectedHandle) {
-      deselectHandle();
+      deselectHandle(true);
     }
   });
 
