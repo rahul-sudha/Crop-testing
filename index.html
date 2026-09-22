@@ -562,14 +562,29 @@
   // ---- Key/click indicator: screen-recording aid, not part of the crop UI ----
   var ARROW_LABELS = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
   var indicatorTimeout = null;
+  var indicatorRaf1 = null;
+  var indicatorRaf2 = null;
 
   function showIndicator(label) {
-    keyIndicator.textContent = label;
-    keyIndicator.classList.add('visible');
     clearTimeout(indicatorTimeout);
-    indicatorTimeout = setTimeout(function () {
-      keyIndicator.classList.remove('visible');
-    }, 850);
+    if (indicatorRaf1) cancelAnimationFrame(indicatorRaf1);
+    if (indicatorRaf2) cancelAnimationFrame(indicatorRaf2);
+
+    // Always drop to hidden first, even on a repeat of the same label, so back-to-back
+    // presses of the same key flicker visibly instead of the pill just sitting there.
+    keyIndicator.classList.remove('visible');
+
+    // A double rAF guarantees the browser actually paints that hidden frame before the
+    // next style change, rather than batching both into a single frame.
+    indicatorRaf1 = requestAnimationFrame(function () {
+      indicatorRaf2 = requestAnimationFrame(function () {
+        keyIndicator.textContent = label;
+        keyIndicator.classList.add('visible');
+        indicatorTimeout = setTimeout(function () {
+          keyIndicator.classList.remove('visible');
+        }, 850);
+      });
+    });
   }
 
   function keyLabel(e) {
