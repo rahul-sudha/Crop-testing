@@ -25,16 +25,52 @@
     overflow: hidden;
   }
 
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
   .phone {
     width: 100%;
     max-width: 430px;
-    height: 100vh;
-    max-height: 932px;
+    height: min(calc(100vh - 44px), 888px);
+    max-height: 888px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     background: var(--canvas-bg);
     position: relative;
+  }
+
+  /* ---------- Key/click indicator (screen-recording aid, not part of the crop UI) ---------- */
+  .key-indicator {
+    min-width: 68px;
+    height: 30px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: opacity 0.1s ease, transform 0.1s ease;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .key-indicator.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* ---------- Top nav bar ---------- */
@@ -412,6 +448,8 @@
 
 </div>
 
+<div class="key-indicator" id="keyIndicator"></div>
+
 <script>
 (function () {
   var handles = document.querySelectorAll('.handle');
@@ -420,6 +458,7 @@
   var moveDoneBtn = document.getElementById('moveDoneBtn');
   var canvasArea = document.getElementById('canvasArea');
   var cropStage = document.getElementById('cropStage');
+  var keyIndicator = document.getElementById('keyIndicator');
 
   var selectedHandle = null;
   var firstMoveControl = moveToolbar.querySelector('.dpad-btn');
@@ -519,6 +558,42 @@
       cropStage.style.transform = '';
     }, 90);
   }
+
+  // ---- Key/click indicator: screen-recording aid, not part of the crop UI ----
+  var ARROW_LABELS = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
+  var indicatorTimeout = null;
+
+  function showIndicator(label) {
+    keyIndicator.textContent = label;
+    keyIndicator.classList.add('visible');
+    clearTimeout(indicatorTimeout);
+    indicatorTimeout = setTimeout(function () {
+      keyIndicator.classList.remove('visible');
+    }, 850);
+  }
+
+  function keyLabel(e) {
+    if (e.key === 'Tab') return e.shiftKey ? 'Shift+Tab' : 'Tab';
+    if (e.key === 'Enter') return 'Enter';
+    if (e.key === ' ' || e.key === 'Spacebar') return 'Space';
+    if (e.key === 'Escape') return 'Esc';
+    return ARROW_LABELS[e.key] || null;
+  }
+
+  // Capture phase so this still sees keys/clicks that in-app handlers stopPropagation() on.
+  document.addEventListener('keydown', function (e) {
+    var label = keyLabel(e);
+    if (label) {
+      showIndicator(label);
+    }
+  }, true);
+
+  document.addEventListener('click', function (e) {
+    // detail is 0 for a keyboard-triggered click (Enter/Space on a button), >=1 for a real pointer click.
+    if (e.detail !== 0) {
+      showIndicator('Click');
+    }
+  }, true);
 })();
 </script>
 
